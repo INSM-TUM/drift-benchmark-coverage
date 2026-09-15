@@ -4,48 +4,24 @@ license: cc-by-4.0
 
 <a name="readme-top"></a>
 
-# Rethinking Behavioral Representations in Concept Drift Detection
+# What Benchmarks Don’t Test: An Existential Gap in Concept Drift Detection
 
-> **Bachelor's Thesis in Information Engineering**  
-> **Author:** Fabian Deigner
 
 ---
 
 ## Abstract
-Organizations operate in constantly changing environments where business processes
-have to adapt due to evolving regulations, shifting strategic goals, and technological
-advances. Accurately detecting concept drift is critical for effective process mining
-and operational monitoring. However, historical research never investigated the
-impact of the expressiveness of the underlying representation used for log abstraction
-when detection concept drifts. The state-of-the-art computer-vision-based CV4CDD-
-4D, relies on the Directly-Follows Graph (DFG) as the underlying log abstraction .
-Although DFGs capture immediate, adjacent activity transitions well, they operate
-strictly on local sequences and do not explicitly represent global, non-adjacent co-
-occurrence relationships across a full trace.
-To address this limitation, this thesis evaluates whether replacing the baseline DFG
-with the more expressive Activity Relationship Matrix (ARM) enhances automated
-drift detection. To resolve the sensitivity of discrete activity relationships to trace-
-level noise, we formulate a continuous, 8-dimensional feature vector that breaks down
-relational rules into temporal and existential frequency weights. By aligning these
-matrices across chronological trace windows, we generate a similarity visualization
-that is fed to the downstream machine learning pipeline.
-Through evaluation across large-scale synthetic benchmarks (CDLG, CDRIFT) and
-custom edge-case datasets, this work demonstrates that the choice of behavioral repre-
-sentation establishes a strict upper bound on downstream drift detection performance.
-While standard DFGs perform adequately on basic process trees where structural shifts
-alter close-range directly follow relations, they remain completely blind to concept drifts
-that modify long-range conditional dependencies without altering local directly-follows
-probabilities. Under these non-directly-follows drift scenarios, the explicit inclusion of
-global existential dependencies in the ARM representation exposes clear visual drift
-boundaries, enabling accurate detection where traditional adjacency baselines fail.
-Additionally, by analyzing boundary limitations on isolated activity transitions, we
-show that standard DFGs can be enhanced by introducing start and end events (DFG-
-IO) to capture secondary boundary effects. Ultimately, this thesis demonstrates that
-moving beyond simple directly-follows abstractions to more expressive, relation-aware
-representations is essential to overcome theoretical blind spots and unlock fine-grained,
-interpretable process analytics
+Business processes evolve over time, and event logs recorded across these changes often mix traces from multiple process versions.
+Concept drift detection identifies if and when such changes occur. Respective detection algorithms are evaluated almost exclusively on two synthetic benchmarks, the Concept Drift Log Generator (CDLG) dataset and CDRIFT, on which state-of-the-art methods report strong detection accuracy. 
+We show that this accuracy is conditional on a structural limitation neither benchmark discloses: both cover only process changes that alter directly-follows relations, leaving the entire class of pure existential changes entirely untested. Through a systematic coverage analysis of all change operations present in CDLG and CDRIFT, we demonstrate that no existing evaluation can reveal whether a detector handles this class of drift.
+To support future evaluation, we contribute a dataset of synthetic event logs covering the full space of existential dependency transitions across five structural categories. Based on our findings, we propose the temporal/existential decomposition as a coverage criterion for concept drift benchmark design.
 
 ---
+
+## Experiments
+
+To demonstrate the impact of including existential-only drift scenarios when evaluating detection algorithms, we
+conduct experiments on the CDLG and CDRIFT datasets. For each dataset, we run the CV4CDD-D4 framework by Kraus
+and van der Aa based on a DFG representation, and an adapted version of it based on the ARM representation. The results of this can be found in the VerificationResults folder.
 
 ## Repository & Branch Structure
 
@@ -66,10 +42,13 @@ Please note the branch organization when reproducing different phases of this pr
 The original datasets (benchmarks) and pre-trained CV4CDD-4D models provided by Kraus & van der Aa are available at:
 * **HuggingFace Repository:** [pm-science/cv4cdd_4d](https://huggingface.co/datasets/pm-science/cv4cdd_4d/tree/main)
 
-### Custom Data & ARM Model
-The custom datasets and retrained model for ARM detection can be found here:
-* **Zenodo Dataset:** [Custom-Data](https://zenodo.org/records/21813069)
+### Existence Only Dataset
+The custom datasets can be found here:
+* **Zenodo Dataset:** [Existence Only](https://doi.org/10.5281/zenodo.22736540)
 
+### ARM Fine-Tuned Model
+The fine-tuned model for ARM cdd can be found here:
+* **Zenodo Model:** [ARM Model](https://doi.org/10.5281/zenodo.22775563)
 ---
 
 ## Setup & Installation
