@@ -4,153 +4,149 @@ license: cc-by-4.0
 
 <a name="readme-top"></a>
 
-# Machine Learning-based Detection of Concept Drifts in Business Processes
-<sub>
-written by <a href="mailto:alexander.kraus@uni-mannheim.de">Alexander Kraus</a><br />
-</sub>
+# What Benchmarks Don’t Test: An Existential Gap in Concept Drift Detection
 
-## About
-This repository contains the implementation, data, evaluation scripts, and results as described in the manuscript
-<i>Machine Learning-based Detection of Concept Drifts in Business Processes</i> 
-by A. Kraus and H. van der Aa, submitted for consideration in the BPM’24 Special Collection of the Process Science journal. 
 
-This work is an extended version of the original paper:
-<i>Looking for Change: A Computer Vision Approach for Concept Drift Detection in Process Mining</i> 
-by A. Kraus and H. van der Aa, accepted for the <i>22nd Business Process Management Conference 2024 in Krakow</i>.
-
+---
 
 ## Abstract
-Concept drift in process mining occurs when a single event log includes data from multiple versions of a process, making the detection of such drifts essential for ensuring reliable process mining results. 
-Although many techniques have been proposed, they exhibit limitations in accuracy and scope. 
-Specifically, their accuracy diminishes when facing noise, varying drift types, or different levels of change severity.
-Additionally, these techniques primarily focus on detecting sudden and gradual drifts, overlooking the automated detection of incremental and recurring drifts.
-To address these limitations, we present \texttt{CV4CDD-4D}, a novel approach for automated concept drift detection that can identify sudden, gradual, incremental, and recurring drifts. 
-Our approach follows an entirely different paradigm. Specifically, it employs a supervised machine learning model fine-tuned on a large collection of event logs with known concept drifts, enabling the model to learn how drifts manifest in event logs.
-The possibility to train such a model has recently emerged through a tool that generates event logs with known concept drifts. 
-However, applying supervised machine learning remains challenging due to the complexities of encoding. 
-To address this, we propose converting an event log into an image-based representation that captures process evolution over time, enabling the use of a state-of-the-art computer vision model to detect drifts. 
-Our experiments show that our approach, compared to existing solutions, improves the accuracy and robustness of drift detection while extending coverage to a broader range of drift types, highlighting the potential of this new paradigm.
-![Alt text](approaches/approach_overview.png)
+Business processes evolve over time, and event logs recorded across these changes often mix traces from multiple process versions.
+Concept drift detection identifies if and when such changes occur. Respective detection algorithms are evaluated almost exclusively on two synthetic benchmarks, the Concept Drift Log Generator (CDLG) dataset and CDRIFT, on which state-of-the-art methods report strong detection accuracy. 
+We show that this accuracy is conditional on a structural limitation neither benchmark discloses: both cover only process changes that alter directly-follows relations, leaving the entire class of pure existential changes entirely untested. Through a systematic coverage analysis of all change operations present in CDLG and CDRIFT, we demonstrate that no existing evaluation can reveal whether a detector handles this class of drift.
+To support future evaluation, we contribute a dataset of synthetic event logs covering the full space of existential dependency transitions across five structural categories. Based on our findings, we propose the temporal/existential decomposition as a coverage criterion for concept drift benchmark design.
 
+---
 
-<!-- GETTING STARTED -->
-## Setup
-To run the approach, follow these steps.
+## Experiments
 
+To demonstrate the impact of including existential-only drift scenarios when evaluating detection algorithms, we
+conduct experiments on the CDLG and CDRIFT datasets. For each dataset, we run the CV4CDD-D4 framework by Kraus
+and van der Aa based on a DFG representation, and an adapted version of it based on the ARM representation. The results of this can be found in the VerificationResults folder.
+
+## Repository & Branch Structure
+
+Please note the branch organization when reproducing different phases of this project:
+
+* **`main` (Verification Branch - Current Branch):**  
+  This branch was used to run the Verification for CDLG and CDRIFT on the COMA-Cluster.
+* **`training` (Training Branch):**  
+  This branch was used to run the preprocessing and model training on the COMA-Cluster.
+* **`custom` (Existence only Branch):**  
+  This branch was used to generate the results for the existence only results and some locally run computations.
+
+---
+
+## Data & Fine-Tuned Models
+
+### Benchmark (Original) Data & DFG Models
+The original datasets (benchmarks) and pre-trained CV4CDD-4D models provided by Kraus & van der Aa are available at:
+* **HuggingFace Repository:** [pm-science/cv4cdd_4d](https://huggingface.co/datasets/pm-science/cv4cdd_4d/tree/main)
+
+### Existence Only Dataset
+The custom datasets can be found here:
+* **Zenodo Dataset:** [Existence Only](https://doi.org/10.5281/zenodo.22736540)
+
+### ARM Fine-Tuned Model
+The fine-tuned model for ARM cdd can be found here:
+* **Zenodo Model:** [ARM Model](https://doi.org/10.5281/zenodo.22775563)
+---
+
+## Setup & Installation
 
 ### Prerequisites
-For full functionality, this repository requires the following software:
-* Python 3.9
-* TensorFlow Model Garden ([clone here](https://github.com/tensorflow/models))
-* [poetry](https://python-poetry.org/) -> for packaging/dependency management, see their website for installation and usage
+* **Python:** 3.9 (Local execution) / 3.11 (COMA Cluster environment)
+* **Poetry:** Dependency management tool ([installation instructions](https://python-poetry.org/))
+* **Git** & **Git LFS**
 
-
-### Installation
-1. Clone the repo
-2. Go into the project root directory
-3. Install dependencies with poetry: 'poetry install'. This creates a virtual environment with the corresponding dependencies.
-
-Optional:
-
-The fine-tuned model comes from the Model Garden for TensorFlow:
-Clone the repo into the folder "models" inside the root directory: git clone https://github.com/tensorflow/models.git
-Originally pulled based on the commit: 3256e1018a402bf30179ffa9b82e01024fa61fc2, Author: mjyun01 <87511647+mjyun01@users.noreply.github.com>, Date:   Fri Jan 26 09:19:30 2024 +0900
-
-To execute run_prodrift.py, create a folder "ProDrift2.5" inside the root directory and place there the ProDrift2.5.jar file from https://apromore.com/research-lab
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-To use a pretrained computer-vision model, use the [predict](approaches/object_detection/predict.py) script.
-Always start a poetry shell, if you use the terminal:
-```sh
-   poetry shell
-```
-```sh
-   cd approaches/object_detection
-```
-```sh
-   python predict.py --model-path <specify path of unzipped pretrained model> --log-dir <specify directory where event logs are stored> --encoding winsim --n-windows 200 --output-dir <specify output directory>
-```
-
-The script outputs not only the visual detection of the drift types, but also a detailed report that specifies the drift moments on traces.
-
-The configuration file can be found [here](approaches/object_detection/utils/config.py). 
-All configuration variables are explained in detail [here](approaches/config_doc.md). 
-
-### Evaluation
-Results from the evaluation can be found [here](EvaluationResults/CV4CDD_4D).
-
-### Data and fine-tuned models
-All datasets and fine-tuned CV4CDD-4D models are available for download [here](https://huggingface.co/datasets/pm-science/cv4cdd_4d/tree/main).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## References
-
-The original version of the repository (https://github.com/jkoessle/ODCD-Framework) was created by Jonathan Koessler within his Master Thesis 
-"Object Detection for Concept Drift - A Deep Learning Framework for Concept Drift Detection in Process Mining", 2023, University of Mannheim.
-
-
-## Running on Coma Cluster
-
-For execution on the COMA cluster, follow these steps to set up the environment and run the training pipeline.
-
-### Environment Setup
-1. **Load Python Module**: Use Spack to load a compatible Python version.
+### Local Setup
+1. Clone the repository and navigate to the project root:
    ```sh
-   module load python/3.11.7-gcc-11.4.1-6677fey
+   git clone <repository-url>
+   cd cv4cdd
    ```
-2. **Virtual Environment**: Create and activate a local environment.
+2. Install dependencies using Poetry (creates a virtual environment):
    ```sh
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install poetry
    poetry install
    ```
-
-### Data Acquisition
-1. **HuggingFace Dataset**: Download the CDLG dataset and TF records.
+3. Activate the Poetry virtual environment:
    ```sh
-   pip install -U "huggingface_hub[cli]"
-   huggingface-cli download pm-science/cv4cdd_4d --include "input_cdlg/*" "tf_records/*" --local-dir ./data
+   poetry shell
    ```
-2. **Model Garden**: Clone the TensorFlow models repository into `./models`.
+4. *(Optional - for training/model garden compatibility)* Clone the TensorFlow Model Garden repository into `./models`:
    ```sh
    git clone https://github.com/tensorflow/models.git ./models
    cd models && git checkout 3256e1018a402bf30179ffa9b82e01024fa61fc2 && cd ..
    ```
 
-### Training Job Submission
-Submit the training job to the SLURM queue. Ensure your `config.py` uses relative paths as configured.
+---
+
+## How to Run
+
+### 1. Local Evaluation & Prediction
+
+To run concept drift prediction on an event log directory using a pre-trained computer vision model:
+
 ```sh
-sbatch sbatch_train.sh
+poetry shell
+cd approaches/object_detection
+python predict.py \
+  --model-path <path_to_unzipped_pretrained_model> \
+  --log-dir <path_to_event_log_directory> \
+  --encoding arm \
+  --n-windows 200 \
+  --output-dir <path_to_output_directory>
 ```
-**Example `sbatch_train.sh`**:
-```bash
-#!/bin/bash
-#SBATCH -J cv4cdd_train
-#SBATCH -p compute
-#SBATCH --gres=gpu:1
-#SBATCH --mem=64G
-#SBATCH -t 24:00:00
 
+Supported `--encoding` configurations:
+* `dfg`: Standard baseline Directly-Follows Graph.
+* `dfg_io`: DFG with artificial Start ($S$) and End ($E$) trace boundary activities.
+* `arm`: Continuous 8D Activity Relationship Matrix representation.
+
+---
+
+### 2. Running on the COMA Cluster
+
+For model retraining and large-scale synthetic benchmark generation on the **COMA Cluster**, follow these steps:
+
+#### Step 1: Environment Setup
+Load Python via Spack and set up the Python virtual environment:
+```sh
+module load python/3.11.7-gcc-11.4.1-6677fey
+python -m venv .venv
 source .venv/bin/activate
-poetry run python approaches/object_detection/train.py
+pip install poetry
+poetry install
 ```
 
-<!-- LICENSE -->
+#### Step 2: Data Acquisition
+Download the required dataset partitions and TF Records from HuggingFace:
+```sh
+pip install -U "huggingface_hub[cli]"
+huggingface-cli download pm-science/cv4cdd_4d --include "input_cdlg/*" "tf_records/*" --local-dir ./data
+```
+Clone the TensorFlow Models repository into `./models`:
+```sh
+git clone https://github.com/tensorflow/models.git ./models
+cd models && git checkout 3256e1018a402bf30179ffa9b82e01024fa61fc2 && cd ..
+```
+
+#### Step 3: Submitting SLURM Jobs
+To reproduce model training, switch to the `training` branch and submit the SLURM job:
+```sh
+git checkout training
+sbatch slurm/scripts/sbatch_train.sh
+```
+
+## References & Citation
+
+This project extends the **CV4CDD-4D** framework:
+
+1. **A. Kraus and H. van der Aa.** *"Machine learning-based detection of concept drift in business processes."* Process Science 2.5 (2025).
+
+---
+
 ## License
 
-2026 Alexander Kraus, University of Mannheim
-
-This work is licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
-
-You are free to share and adapt this work for any purpose, including commercial use, provided that appropriate credit is given to the authors.
-
-See `LICENSE.txt` for the full license text.
+This repository is licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0). See `LICENSE.txt` for details.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
