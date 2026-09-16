@@ -27,12 +27,12 @@ and van der Aa based on a DFG representation, and an adapted version of it based
 
 Please note the branch organization when reproducing different phases of this project:
 
-* **`main` (Evaluation Branch - Current Branch):**  
-  This branch was used to run all evaluation experiments presented in the thesis.
+* **`main` (Verification Branch - Current Branch):**  
+  This branch was used to run the Verification for CDLG and CDRIFT on the COMA-Cluster.
 * **`training` (Training Branch):**  
-  This branch was used to run the preprocessing and model training.
-* **`custom` (Evaluation Branch - Current Branch):**  
-  This branch was used to run custom evaluation and some locally run computations.
+  This branch was used to run the preprocessing and model training on the COMA-Cluster.
+* **`custom` (Existence only Branch):**  
+  This branch was used to generate the results for the existence only results and some locally run computations.
 
 ---
 
