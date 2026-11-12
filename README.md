@@ -13,7 +13,7 @@ license: cc-by-4.0
 Business processes evolve over time, and event logs recorded across these changes often mix traces from multiple process versions.
 Concept drift detection identifies if and when such changes occur. Respective detection algorithms are evaluated almost exclusively on two synthetic benchmarks, the Concept Drift Log Generator (CDLG) dataset and CDRIFT, on which state-of-the-art methods report strong detection accuracy. 
 We show that this accuracy is conditional on a structural limitation neither benchmark discloses: both cover only process changes that alter directly-follows relations, leaving the entire class of pure existential changes entirely untested. Through a systematic coverage analysis of all change operations present in CDLG and CDRIFT, we demonstrate that no existing evaluation can reveal whether a detector handles this class of drift.
-To support future evaluation, we contribute a dataset of synthetic event logs covering the full space of existential dependency transitions across five structural categories. Based on our findings, we propose the temporal/existential decomposition as a coverage criterion for concept drift benchmark design.
+To support future evaluation, we contribute a dataset of 25 synthetic event logs with existential-only drifts across four structural categories, realizing 11 of the 19 admissible existential transitions. Based on our findings, we propose the temporal/existential decomposition as a coverage criterion for concept drift benchmark design.
 
 ---
 
