@@ -26,7 +26,16 @@ Existential dependency of (A, B)
 
 With tau = 1 these are exactly the noise-free definitions (and armature's existential rules).
 
-Self pairs (A, A) are reported separately (self-loop gained/lost/changed), see `diag_cell`.
+Self pairs (A, A) (diagonal)
+----------------------------
+Relevant traces: those containing A; A repeats in a trace if it occurs more than once.
+  no repetition (<= 1 - tau of the relevant traces)   (×, −)
+  otherwise                                           (≺?, ⇐)  (a later occurrence implies an earlier one)
+     with the directness among the repeating traces: share with A directly followed by A
+     >= tau -> ≺d ; <= 1 - tau -> ≺t ; otherwise ≺
+E.g. e,f (sequence) -> e,f,e (loop) changes (e,e) from (×,−) to (≺t,⇐): T18 + E27, i.e. a mixed transition.
+Diagonal cells take part in the drift classification like every other pair (they are not checked
+against Table 1, since (×,−) is the neutral diagonal and not a relation between two activities).
 """
 
 from __future__ import annotations
@@ -266,22 +275,26 @@ def pair_cell(s: SegmentStats, a, b, tau):
     return (t, e)
 
 
+DIAG_NONE = (("x", 0), ("ind", 0))   # activity does not repeat: (×, −)
+
+
 def diag_cell(s: SegmentStats, a, tau):
-    """Self pair: None if the activity does not repeat beyond the noise share (1 - tau)."""
+    """Self pair: (×,−) if the activity does not repeat beyond the noise share (1 - tau),
+    otherwise (≺d/≺/≺t, ⇐) with the directness of the repetitions."""
     eps = 1e-12
     r = s.rep.get(a, 0)
     if r / s.occ[a] <= 1 - tau + eps:
-        return None
+        return DIAG_NONE
     k = s.rep_direct.get(a, 0) / r
     base = "d" if k >= tau - eps else ("t" if k <= 1 - tau + eps else "e")
-    return ((base, 1), ("imp", 1))
+    return ((base, 1), ("imp", -1))
 
 
 @dataclass
 class ARM:
     sigma: set
     cells: dict        # (a,b) with a<b -> cell
-    diag: dict         # a -> cell|None
+    diag: dict         # a -> cell (DIAG_NONE if a does not repeat)
     stats: SegmentStats
 
 
@@ -324,11 +337,10 @@ class DriftResult:
     n_mixed: int
     n_existence: int
     ids: Counter
-    pairs: list          # (a, b, before_str, after_str, kind, ids)
+    pairs: list          # (a, b, before_str, after_str, kind, ids), diagonal pairs have a == b
     diag_changes: list   # (a, before_str, after_str)
     inadmissible_E: list
     invalid_cells: list
-    class_with_diag: str
 
 
 def compare(arm0: ARM, arm1: ARM) -> DriftResult:
@@ -358,11 +370,20 @@ def compare(arm0: ARM, arm1: ARM) -> DriftResult:
         if kind == "existential" and tid[0] in E_INADMISSIBLE:
             inad.append((k, tid[0]))
         pairs.append((k[0], k[1], cell_str(c0), cell_str(c1), kind, tid))
+    # diagonal: (A, A) for activities present on both sides, classified like any other pair
     diag_ch = []
     for a in sorted(s0 & s1):
-        if arm0.diag[a] != arm1.diag[a]:
-            diag_ch.append((a, cell_str(arm0.diag[a]) if arm0.diag[a] else "none",
-                            cell_str(arm1.diag[a]) if arm1.diag[a] else "none"))
+        c0, c1 = arm0.diag[a], arm1.diag[a]
+        if c0 == c1:
+            continue
+        kind, tid = transition(c0, c1)
+        nt += kind == "temporal"
+        ne += kind == "existential"
+        nm += kind == "mixed"
+        for i in tid:
+            ids[i] += 1
+        diag_ch.append((a, cell_str(c0), cell_str(c1)))
+        pairs.append((a, a, cell_str(c0), cell_str(c1), kind, tid))
     if added or removed:
         cls = "existence"
     elif nt + ne + nm == 0:
@@ -373,20 +394,7 @@ def compare(arm0: ARM, arm1: ARM) -> DriftResult:
         cls = "existential-only"
     else:
         cls = "mixed"
-    # alternative class counting self-pair changes as well (a self-loop change alters d_t and d_e)
-    cls_d = cls
-    if cls not in ("existence",) and diag_ch:
-        kinds = set()
-        for a, b0, b1 in diag_ch:
-            if "none" in (b0, b1):
-                kinds.add("mixed")
-            else:
-                kinds.add("temporal")  # only the directness can differ, d_e is ⇒ on both sides
-        allk = kinds | ({"temporal"} if nt else set()) | ({"existential"} if ne else set()) | (
-            {"mixed"} if nm else set())
-        cls_d = {frozenset({"temporal"}): "temporal-only",
-                 frozenset({"existential"}): "existential-only"}.get(frozenset(allk), "mixed")
-    return DriftResult(cls, added, removed, nt, ne, nm, nx, ids, pairs, diag_ch, inad, invalid, cls_d)
+    return DriftResult(cls, added, removed, nt, ne, nm, nx, ids, pairs, diag_ch, inad, invalid)
 
 
 # --- segmentation ------------------------------------------------------------------------

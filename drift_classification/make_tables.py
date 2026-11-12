@@ -32,6 +32,16 @@ def expected(log):
     return f"{ESYM[a]}→{ESYM[b]} ({E_ID[(a, b)]})"
 
 
+# Manual corrections: drifts the first-occurrence ordering misclassifies; class_dfg_based gives the evidence.
+MANUAL = {
+    ("cdlg", "log_168_1726735314.xes", "drift_1/change_info_1"): (
+        "mixed",
+        "manually set to mixed (script: existential-only): the redo part of a loop is swapped with the subsequent "
+        "sequence, which necessarily changes the order of the swapped activities; first-occurrence ordering misses it "
+        "because all activities lie in an outer loop, the DFG-based ARM shows (e,l) ≻d→−, (b,g) ≻d→−, (b,l) −→≻d"),
+}
+
+
 def table(bench, head, extra=lambda r: {}):
     dfg = {(r["log"], r["drift_index"]): r["drift_class"] for r in read(f"{bench}_armature_drifts.csv")
            if r["start_end"] == SE}
@@ -39,13 +49,15 @@ def table(bench, head, extra=lambda r: {}):
     for r in read(f"{bench}_drifts.csv"):
         if r["tau"] != TAU or r["start_end"] != SE:
             continue
+        cls, note = MANUAL.get((bench, r["log"], r.get("drift_label", "")), (r["drift_class"], ""))
         out.append({k: r[k] for k in head} | extra(r) | dict(
-            drift_class=r["drift_class"], class_incl_self_pairs=r["class_incl_self_pairs"],
+            drift_class=cls,
             class_dfg_based=dfg.get((r["log"], r["drift_index"]), ""),
             temporal_transitions=split_ids(r["transition_ids"], "T"),
             existential_transitions=split_ids(r["transition_ids"], "E"),
             n_temporal_pairs=r["n_temporal"], n_existential_pairs=r["n_existential"], n_mixed_pairs=r["n_mixed"],
-            activities_added=r["sigma_added"], activities_removed=r["sigma_removed"]))
+            activities_added=r["sigma_added"], activities_removed=r["sigma_removed"]) | (
+            dict(note=note) if bench == "cdlg" else {}))
     os.makedirs("results", exist_ok=True)
     rv.write_csv(os.path.join("results", f"{bench}_drift_classes.csv"), out)
     print(bench, len(out))

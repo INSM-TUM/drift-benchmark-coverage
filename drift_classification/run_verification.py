@@ -220,7 +220,7 @@ def process(job):
                     continue
                 r = compare(arm_from_stats(s0, tau), arm_from_stats(s1, tau))
                 rows.append(base | dict(
-                    drift_class=r.drift_class, class_incl_self_pairs=r.class_with_diag,
+                    drift_class=r.drift_class,
                     n_temporal=r.n_temporal, n_existential=r.n_existential, n_mixed=r.n_mixed,
                     n_existence_pairs=r.n_existence, transition_ids=fmt_ids(r.ids),
                     sigma_added="|".join(r.sigma_added), sigma_removed="|".join(r.sigma_removed),

@@ -26,7 +26,7 @@ and van der Aa based on a DFG representation, and an adapted version of it based
 ## Drift Classification of the Benchmarks
 
 [`drift_classification/`](drift_classification) classifies every drift of the existential dataset, CDRIFT and CDLG as temporal-only, existential-only, mixed or existence drift, and maps it to the transition IDs of the temporal and existential transition tables.
-For each change point, the ARM is derived from the traces directly before and after the change (a margin around the change point and the full window of gradual changes are excluded) with threshold τ = 0.95 and no artificial start/end activities. Only pairs of distinct activities are considered; for repeated activities, temporal precedence is taken from their first occurrence in a trace.
+For each change point, the ARM is derived from the traces directly before and after the change (a margin around the change point and the full window of gradual changes are excluded) with threshold τ = 0.95 and no artificial start/end activities. For pairs of distinct activities, temporal precedence is taken from the first occurrence of each activity in a trace. The diagonal (A, A) is part of the classification: it is (×, −) if A does not repeat and (≺t, ⇐), (≺, ⇐) or (≺d, ⇐) if it does, depending on whether A never, sometimes or always directly follows itself. Turning a sequence e, f into a loop e, f, e thus changes (e, e) from (×, −) to (≺t, ⇐) (T18, E27), so such a drift is mixed.
 
 Result tables, one row per drift (CDLG: per change event):
 
@@ -38,8 +38,8 @@ Result tables, one row per drift (CDLG: per change event):
 
 Main columns:
 * `drift_class`: classification as described above.
-* `class_incl_self_pairs`: the same, but also counting changes of an activity's relation to itself (an activity becoming repeatable or not).
-* `class_dfg_based`: the same, with the temporal relations derived from the directly-follows graph (loop-aware) instead of first occurrences.
+* `class_dfg_based`: the same, with the ARM discovered by armature (temporal relations from the directly-follows graph, loop-aware) instead of first occurrences. Since armature sets a temporal relation on the diagonal only if an activity directly follows itself, a repeating activity without such a relation is taken as (≺, ⇐), so here too a sequence becoming a loop is mixed.
+* `note` (CDLG only): manual corrections. One drift (`log_168`) is set to mixed by hand: it swaps the redo part of a loop with the subsequent sequence, which the first-occurrence ordering cannot see because all activities lie in an outer loop; `class_dfg_based` shows the temporal transitions.
 * `temporal_transitions`, `existential_transitions`: transition IDs with the number of activity pairs realizing them, e.g. `E2x3` = transition E2 in three pairs.
 * `activities_added`, `activities_removed`: changes of the activity set (existence drift).
 * CDLG only: `tree_before`, `tree_after` and `documented_*` as documented by the generator. Own dataset only: `expected_from_name`, the transition encoded in the log name.

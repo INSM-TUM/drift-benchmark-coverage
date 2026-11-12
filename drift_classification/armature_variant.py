@@ -1,7 +1,9 @@
 """Sensitivity run: classify every drift with armature's own extractors (exact, no tau, no filter).
 
 armature's temporal extractor is DFG/SCC based (loop-aware); armdrift orients pairs by first occurrence.
-Both agree on all existential labels and on all temporal labels outside loop contexts
+Both agree on all existential labels and on all temporal labels outside loop contexts.
+Diagonal: armature sets a temporal label for (A, A) only if A directly follows itself; for e,f,e we use
+(≺,⇐) here (armdrift: (≺t,⇐)), so a loop that appears or disappears is mixed in both.
 Output: out/<bench>_armature_drifts.csv
 """
 import os
@@ -37,8 +39,12 @@ def armature_arm(traces, se):
     ex = extract_existential_dependencies(T)
     acts = sorted({a for v in var for a in v})
     cells = {(a, b): (TM[str(tp[(a, b)])], EM[str(ex[(a, b)])]) for i, a in enumerate(acts) for b in acts[i + 1:]}
-    diag = {a: ((TM[str(tp[(a, a)])], EM[str(ex[(a, a)])]) if (a, a) in tp and (a, a) in ex else None)
-            for a in acts}
+    # Diagonal: armature marks a repeating activity existentially (implication, shown as ⇐) but sets a
+    # temporal label only if a directly follows itself. A repeating activity always gets a dependency here
+    # (eventual if armature left the temporal part unset), so gaining/losing a repetition is mixed as in
+    # armdrift; a non-repeating activity is (×, −).
+    diag = {a: ((TM[str(tp[(a, a)])] if (a, a) in tp else ("e", 1)), ("imp", -1)) if (a, a) in ex
+            else (("x", 0), ("ind", 0)) for a in acts}
     return ARM(set(acts), cells, diag, None)
 
 
@@ -59,7 +65,7 @@ def work(job):
         for k in range(len(job["changes"])):
             r = compare(arms[k], arms[k + 1])
             rows.append(dict(benchmark=job["benchmark"], log=job["log"], op=job["op"], noise=job["noise"],
-                             drift_index=k + 1, start_end="yes" if se else "no", drift_class=r.drift_class, class_incl_self_pairs=r.class_with_diag,
+                             drift_index=k + 1, start_end="yes" if se else "no", drift_class=r.drift_class,
                              transition_ids=rv.fmt_ids(r.ids),
                              temporal_pairs="|".join(f"{a},{b}:{b0}->{b1}" for a, b, b0, b1, kd, _ in r.pairs
                                                      if kd in ("temporal", "mixed"))))
