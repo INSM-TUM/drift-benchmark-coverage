@@ -170,3 +170,10 @@ test.py
 
 # debugging
 launch.json
+
+# drift classification: keep the result tables and dataset metadata, not raw outputs or downloaded benchmarks
+!drift_classification/results/*.csv
+!existence_only/**/drift_info.csv
+drift_classification/out/
+drift_classification/data/
+__pycache__/

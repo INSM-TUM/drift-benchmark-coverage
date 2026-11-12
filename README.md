@@ -23,6 +23,36 @@ To demonstrate the impact of including existential-only drift scenarios when eva
 conduct experiments on the CDLG and CDRIFT datasets. For each dataset, we run the CV4CDD-D4 framework by Kraus
 and van der Aa based on a DFG representation, and an adapted version of it based on the ARM representation. The results of this can be found in the VerificationResults folder.
 
+## Drift Classification of the Benchmarks
+
+[`drift_classification/`](drift_classification) classifies every drift of the existential dataset, CDRIFT and CDLG as temporal-only, existential-only, mixed or existence drift, and maps it to the transition IDs of the temporal and existential transition tables.
+For each change point, the ARM is derived from the traces directly before and after the change (a margin around the change point and the full window of gradual changes are excluded) with threshold τ = 0.95 and no artificial start/end activities. Only pairs of distinct activities are considered; for repeated activities, temporal precedence is taken from their first occurrence in a trace.
+
+Result tables, one row per drift (CDLG: per change event):
+
+| File | Logs | Drifts |
+|---|---|---|
+| [`own_drift_classes.csv`](drift_classification/results/own_drift_classes.csv) | 25 (existential dataset) | 25 |
+| [`cdrift_drift_classes.csv`](drift_classification/results/cdrift_drift_classes.csv) | 115 (all in-scope CDRIFT logs, incl. noisy ones) | 157 |
+| [`cdlg_drift_classes.csv`](drift_classification/results/cdlg_drift_classes.csv) | first 1,000 of the 2,858 noise-free CDLG test logs with drifts | 3,892 |
+
+Main columns:
+* `drift_class`: classification as described above.
+* `class_incl_self_pairs`: the same, but also counting changes of an activity's relation to itself (an activity becoming repeatable or not).
+* `class_dfg_based`: the same, with the temporal relations derived from the directly-follows graph (loop-aware) instead of first occurrences.
+* `temporal_transitions`, `existential_transitions`: transition IDs with the number of activity pairs realizing them, e.g. `E2x3` = transition E2 in three pairs.
+* `activities_added`, `activities_removed`: changes of the activity set (existence drift).
+* CDLG only: `tree_before`, `tree_after` and `documented_*` as documented by the generator. Own dataset only: `expected_from_name`, the transition encoded in the log name.
+
+To reproduce (Python ≥ 3.9; about 15 minutes, dominated by CDLG):
+```sh
+cd drift_classification
+pip install -r requirements.txt
+./fetch_data.sh   # CDRIFT and CDLG logs from HuggingFace into data/
+./run_all.sh      # raw outputs in out/, tables in results/
+```
+`class_dfg_based` is only filled if [armature](https://github.com/INSM-TUM/armature) is installed (Python ≥ 3.10) or `ARMATURE_REPO` points to a checkout.
+
 ## Repository & Branch Structure
 
 Please note the branch organization when reproducing different phases of this project:
@@ -43,8 +73,7 @@ The original datasets (benchmarks) and pre-trained CV4CDD-4D models provided by 
 * **HuggingFace Repository:** [pm-science/cv4cdd_4d](https://huggingface.co/datasets/pm-science/cv4cdd_4d/tree/main)
 
 ### Existence Only Dataset
-The custom datasets can be found here:
-* **Zenodo Dataset:** [Existence Only](https://doi.org/10.5281/zenodo.22736540)
+The dataset is included in [`existence_only/`](existence_only): 25 event logs (gzipped XES) in four categories, `isolated`, `surrounding_activities`, `gradual` (5 logs each) and `related conditions` (10 logs). Each folder has a `drift_info.csv` with the change points in the CDLG format. Every log contains one existential-only drift; the realized transitions are listed in [`drift_classification/results/own_drift_classes.csv`](drift_classification/results/own_drift_classes.csv).
 
 ### ARM Fine-Tuned Model
 The fine-tuned model for ARM cdd can be found here:

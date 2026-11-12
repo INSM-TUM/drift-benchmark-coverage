@@ -1,0 +1,36 @@
+log_name;drift_or_noise_id;drift_attribute;drift_sub_attribute;value
+log_OR_AND.xes;drift_1;log_id;na;log_OR_AND.xes
+log_OR_AND.xes;drift_1;drift_id;na;1
+log_OR_AND.xes;drift_1;process_perspective;na;control-flow
+log_OR_AND.xes;drift_1;drift_type;na;gradual
+log_OR_AND.xes;drift_1;drift_specific_information;na;linear distribution
+log_OR_AND.xes;drift_1;change_info_1;change_start;2026-08-14 10:40:04.972835 [2000]
+log_OR_AND.xes;drift_1;change_info_1;change_end;2027-12-01 16:23:12.744568 [3000]
+log_IMP_AND.xes;drift_1;log_id;na;log_IMP_AND.xes
+log_IMP_AND.xes;drift_1;drift_id;na;1
+log_IMP_AND.xes;drift_1;process_perspective;na;control-flow
+log_IMP_AND.xes;drift_1;drift_type;na;gradual
+log_IMP_AND.xes;drift_1;drift_specific_information;na;linear distribution
+log_IMP_AND.xes;drift_1;change_info_1;change_start;2026-06-28 21:07:42.918804 [2000]
+log_IMP_AND.xes;drift_1;change_info_1;change_end;2027-10-13 20:50:36.968361 [3000]
+log_IMP_OR.xes;drift_1;log_id;na;log_IMP_OR.xes
+log_IMP_OR.xes;drift_1;drift_id;na;1
+log_IMP_OR.xes;drift_1;process_perspective;na;control-flow
+log_IMP_OR.xes;drift_1;drift_type;na;gradual
+log_IMP_OR.xes;drift_1;drift_specific_information;na;linear distribution
+log_IMP_OR.xes;drift_1;change_info_1;change_start;2026-07-12 01:29:44.992143 [2000]
+log_IMP_OR.xes;drift_1;change_info_1;change_end;2027-10-18 11:53:25.665493 [3000]
+log_IMP_IMP.xes;drift_1;log_id;na;log_IMP_IMP.xes
+log_IMP_IMP.xes;drift_1;drift_id;na;1
+log_IMP_IMP.xes;drift_1;process_perspective;na;control-flow
+log_IMP_IMP.xes;drift_1;drift_type;na;gradual
+log_IMP_IMP.xes;drift_1;drift_specific_information;na;linear distribution
+log_IMP_IMP.xes;drift_1;change_info_1;change_start;2026-07-29 22:50:42.208266 [2000]
+log_IMP_IMP.xes;drift_1;change_info_1;change_end;2027-10-24 13:37:18.281335 [3000]
+log_AND_OR.xes;drift_1;log_id;na;log_AND_OR.xes
+log_AND_OR.xes;drift_1;drift_id;na;1
+log_AND_OR.xes;drift_1;process_perspective;na;control-flow
+log_AND_OR.xes;drift_1;drift_type;na;gradual
+log_AND_OR.xes;drift_1;drift_specific_information;na;linear distribution
+log_AND_OR.xes;drift_1;change_info_1;change_start;2026-08-14 10:40:04.972835 [2000]
+log_AND_OR.xes;drift_1;change_info_1;change_end;2027-12-01 16:23:12.744568 [3000]

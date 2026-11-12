@@ -1,0 +1,31 @@
+log_name;drift_or_noise_id;drift_attribute;drift_sub_attribute;value
+log_OR_AND.xes;drift_1;log_id;na;log_OR_AND.xes
+log_OR_AND.xes;drift_1;drift_id;na;1
+log_OR_AND.xes;drift_1;process_perspective;na;control-flow
+log_OR_AND.xes;drift_1;drift_type;na;sudden
+log_OR_AND.xes;drift_1;change_info_1;change_start;2027-03-08 15:26:08.228545 [2500]
+log_OR_AND.xes;drift_1;change_info_1;change_end;
+log_IMP_AND.xes;drift_1;log_id;na;log_IMP_AND.xes
+log_IMP_AND.xes;drift_1;drift_id;na;1
+log_IMP_AND.xes;drift_1;process_perspective;na;control-flow
+log_IMP_AND.xes;drift_1;drift_type;na;sudden
+log_IMP_AND.xes;drift_1;change_info_1;change_start;2027-03-07 22:19:38.349935 [2500]
+log_IMP_AND.xes;drift_1;change_info_1;change_end;
+log_IMP_OR.xes;drift_1;log_id;na;log_IMP_OR.xes
+log_IMP_OR.xes;drift_1;drift_id;na;1
+log_IMP_OR.xes;drift_1;process_perspective;na;control-flow
+log_IMP_OR.xes;drift_1;drift_type;na;sudden
+log_IMP_OR.xes;drift_1;change_info_1;change_start;2027-03-30 07:03:30.804741 [2500]
+log_IMP_OR.xes;drift_1;change_info_1;change_end;
+log_IMP_IMP.xes;drift_1;log_id;na;log_IMP_IMP.xes
+log_IMP_IMP.xes;drift_1;drift_id;na;1
+log_IMP_IMP.xes;drift_1;process_perspective;na;control-flow
+log_IMP_IMP.xes;drift_1;drift_type;na;sudden
+log_IMP_IMP.xes;drift_1;change_info_1;change_start;2027-03-24 05:53:32.944115 [2500]
+log_IMP_IMP.xes;drift_1;change_info_1;change_end;
+log_AND_OR.xes;drift_1;log_id;na;log_AND_OR.xes
+log_AND_OR.xes;drift_1;drift_id;na;1
+log_AND_OR.xes;drift_1;process_perspective;na;control-flow
+log_AND_OR.xes;drift_1;drift_type;na;sudden
+log_AND_OR.xes;drift_1;change_info_1;change_start;2027-03-08 15:26:08.228545 [2500]
+log_AND_OR.xes;drift_1;change_info_1;change_end;
